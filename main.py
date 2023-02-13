@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup as BS
 import config
 import pymorphy2
 
-
 bot = telebot.TeleBot(config.TOKEN)
 
 
@@ -51,6 +50,11 @@ def website(message):
     bot.send_message(message.chat.id, "Перейдите на сайт", parse_mode='html', reply_markup=markup)
 
 
+@bot.message_handler(commands=['get_update'])
+def upd(message):
+    bot.send_message(message.chat.id, 'something', parse_mode='html')
+
+
 @bot.message_handler(content_types=['text'])
 def olympiadas(message):
     ans = []
@@ -60,3 +64,4 @@ def olympiadas(message):
 
 
 bot.polling()
+#oerhgoieh
