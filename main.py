@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup as BS
 import config
 import pymorphy2
 
-
 bot = telebot.TeleBot(config.TOKEN)
 
 
@@ -49,6 +48,11 @@ def website(message):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("Перейти на сайт ИТМО", url="https://itmo.ru"))
     bot.send_message(message.chat.id, "Перейдите на сайт", parse_mode='html', reply_markup=markup)
+
+
+@bot.message_handler(commands=['get_update'])
+def upd(message):
+    bot.send_message(message.chat.id, 'хуй', parse_mode='html')
 
 
 @bot.message_handler(content_types=['text'])
