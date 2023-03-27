@@ -39,7 +39,7 @@ list_of_olymps = parser(config.URL1)
 @bot.message_handler(commands=['start'])
 def start(message):
     mess = f'Привет, <b>{message.from_user.first_name}!</b>'
-    mess1 = f'Чтобы увидеть весь список олимпиад на ДЕКАБРЬ введите любое число: '
+    mess1 = f'Чтобы увидеть весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ введите любое число: '
     bot.send_message(message.chat.id, mess, parse_mode='html')
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
