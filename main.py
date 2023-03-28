@@ -79,14 +79,40 @@ def if_sp(message: types.Message):
 def olympiadas(message):
     text = message.text
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    ans = []
     if message.text.isdigit():
-        ans = []
         for s in list_of_olymps:
             ans.append(s)
         if len(ans) == 0:
             print('УВЫ! В это месяце нет олимпиад по информатике')
+        else:
+            bot.send_message(message.chat.id, '\n'.join(ans))
+    elif text[:15] == 'узнать уровень ':
+        text = str(text[:15]).lower()
+        text.replace('олимпиада', '')
+        text.replace('открытая', '')
+        excel_file = openpyxl.load_workbook('calendar.xlsx')
+        olymps = excel_file['Уровни']
+        line = 0
+        for x in range(3, 22):
+            if text in str(olymps.cell(row=x, column=2).value).lower():
+                line = x
+        if line == 0:
+            kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            kb.row('Вернуться в главное меню')
+            error = 'Олимпиада находится не в списке РСОШ или вы ошиблись в названии'
+            btn = "Вернуться"
+            mess = f'Нажмите на кнопку {btn} и попробуйте ещё раз'
+            bot.send_message(message.chat.id, error, reply_markup=kb)
+            bot.send_message(message.chat.id, mess)
+        else:
+            kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            kb.row('Вернуться в главное меню', 'Узнать подробнее об этой олимпиаде')
+            data = []
+            for x in range(1, 6):
+                data.append(olymps.cell(row=line, column=x).value)
+            bot.send_message(message.chat.id, f'УРОВЕНЬ: {data[3]}\n')
 
-        bot.send_message(message.chat.id, '\n'.join(ans))
 
 
 bot.infinity_polling(skip_pending=True)
