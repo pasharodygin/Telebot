@@ -60,11 +60,21 @@ def start(message):
     btn1 = types.KeyboardButton(text='Узнать все про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
-    kb.add(btn1, btn2, btn3)
+    btn4 = types.KeyboardButton(text='Весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ')
+    kb.add(btn1, btn2, btn3, btn4)
     mess = f'Привет, <b>{message.from_user.first_name}!</b>'
     mess1 = f'Используй <b>меню кнопок</b> для дальнейшей работы'
     bot.send_message(message.chat.id, mess, parse_mode='html', reply_markup=kb)
     bot.send_message(message.chat.id, mess1, parse_mode='html')
+
+
+@bot.message_handler(func=lambda x: x.text == 'Получить ссылку на сайт этой олимпиады')
+def get_link(mess):
+    global link
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    btn = types.KeyboardButton(text='Вернуться в главное меню')
+    kb.add(btn)
+    bot.send_message(mess.chat.id, link, reply_markup=kb)
 
 
 @bot.message_handler(commands=['website'])
@@ -74,13 +84,28 @@ def website(message):
     bot.send_message(message.chat.id, "Перейдите на сайт", parse_mode='html', reply_markup=markup)
 
 
+@bot.message_handler(func=lambda x: x.text == 'Весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ')
+def tec_month(message: types.Message):
+    ans = []
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    btn1 = types.KeyboardButton(text='Вернуться в главное меню')
+    kb.add(btn1)
+    for s in list_of_olymps:
+        ans.append(s)
+    if len(ans) == 0:
+        bot.send_message(message.chat.id, '\u274CУВЫ! В это месяце нет олимпиад по информатике', reply_markup=kb)
+    else:
+        bot.send_message(message.chat.id, '\n'.join(ans), reply_markup=kb)
+
+
 @bot.message_handler(func=lambda x: x.text == 'Вернуться в главное меню')
 def return_(message: types.Message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(text='Узнать все про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
-    kb.add(btn1, btn2, btn3)
+    btn4 = types.KeyboardButton(text='Весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ')
+    kb.add(btn1, btn2, btn3, btn4)
     bot.send_message(message.chat.id, "Теперь вы находитесь в главном меню, продолжайте работу", reply_markup=kb)
 
 
@@ -92,7 +117,7 @@ def if_sp(message: types.Message):
 
 @bot.message_handler(func=lambda x: x.text == 'Узнать все про олимпиаду')
 def get_inf(message):
-    mess1 = 'Чтобы узнать всё про олимпиаду, введите: \n<i>узнать все <b>название олимпиады</b></i>\nНапример: узнать все Высшая проба'
+    mess1 = f'Чтобы узнать всё про олимпиаду, введите: \n<i>узнать все <b>название олимпиады</b></i>\nНапример: узнать все Высшая проба'
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
 
@@ -104,16 +129,9 @@ def if_sp(message: types.Message):
 @bot.message_handler(content_types=['text'])
 def olympiadas(message):
     text = message.text
-    ans = []
+    global link
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    if message.text.isdigit():
-        for s in list_of_olymps:
-            ans.append(s)
-        if len(ans) == 0:
-            print('\uE333УВЫ! В это месяце нет олимпиад по информатике')
-        else:
-            bot.send_message(message.chat.id, '\n'.join(ans))
-    elif len(text) > 15 and text[:15].lower() == 'узнать уровень ':
+    if len(text) > 15 and text[:15].lower() == 'узнать уровень ':
         text = str(text[15:]).lower()
         line = 0
         for x in range(3, 22):
@@ -125,7 +143,7 @@ def olympiadas(message):
         else:
             kb.row('Вернуться в главное меню', 'Получить ссылку на сайт этой олимпиады')
             k = olymps.cell(row=line, column=4).value
-            link = olymps.cell(row=line, column=5).value
+            link = str(olymps.cell(row=line, column=5).value)
             bot.send_message(message.chat.id, f'УРОВЕНЬ: {k}\n', reply_markup=kb)
     elif len(text) > 11 and text[:11].lower() == 'узнать все ':
         text = str(text[11:]).lower()
@@ -139,8 +157,7 @@ def olympiadas(message):
         else:
             btn1 = types.KeyboardButton(text='Вернуться в главное меню')
             kb.add(btn1)
-            mess = str()
-            mess += f'<b>{str(olymps.cell(row=line, column=2).value)}</b>:\n'
+            mess = str(olymps.cell(row=line, column=2).value) + ':\n'
             mess += 'Номер в списке РСОШ: ' + str(olymps.cell(row=line, column=1).value) + '\n'
             mess += 'Ссылка на сайт: ' + str(olymps.cell(row=line, column=5).value) + '\n'
             mess += 'Уровень: ' + str(olymps.cell(row=line, column=4).value) + '\n'
