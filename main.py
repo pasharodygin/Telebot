@@ -12,6 +12,13 @@ olymps = excel_file['Уровни']
 kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
 
+def print_olymp(message: types.Message):
+    mess1 = str()
+    for x in range(3, 22):
+        mess1 += f'\U0001F538 {olymps.cell(row=x, column=2).value}\n'
+    bot.send_message(message.chat.id, mess1, parse_mode='html')
+
+
 def print_day(n):
     morph = pymorphy2.MorphAnalyzer()
     day = morph.parse('день')[0]
@@ -34,6 +41,12 @@ def parser(url):
             time = ' ' + time
         ans.append(date + name + time)
     return ans
+
+def wrong_request(message: types.Message):
+    mess = 'Наш бот не может распознать ваше сообщение, убедитесь, что вы его правильно написали или вернитесь в главное меню'
+    btn1 = types.KeyboardButton(text='Вернуться в главное меню')
+    kb.add(btn1)
+    bot.send_message(message.chat.id, mess, parse_mode='html', reply_markup=kb)
 
 
 list_of_olymps = parser(config.URL1)
@@ -80,10 +93,7 @@ def if_sp(message: types.Message):
 
 @bot.message_handler(func=lambda msg: msg.text == "Вывести все олимпиады")
 def if_sp(message: types.Message):
-    mess1 = str()
-    for x in range(3, 22):
-        mess1 += f'\U0001F538 {olymps.cell(row=x, column=2).value}\n'
-    bot.send_message(message.chat.id, mess1, parse_mode='html')
+    print_olymp(message)
 
 
 @bot.message_handler(content_types=['text'])
@@ -106,7 +116,7 @@ def olympiadas(message):
                 break
         if line == 0:
             kb.row('Вернуться в главное меню', 'Вывести все олимпиады')
-            error = '\uE333Олимпиада находится не в списке РСОШ или вы ошиблись в названии'
+            error = '\u274CОлимпиада находится не в списке РСОШ или вы ошиблись в названии'
             btn = "Вернуться"
             mess = f'Нажми на кнопку {btn} или ознакомься со списком всех олимпиад'
             bot.send_message(message.chat.id, error, reply_markup=kb)
@@ -115,6 +125,8 @@ def olympiadas(message):
             kb.row('Вернуться в главное меню', 'Получить ссылку на сайт олимпиады')
             k = olymps.cell(row=line, column=4).value
             bot.send_message(message.chat.id, f'УРОВЕНЬ: {k}\n', reply_markup=kb)
+    else:
+        wrong_request(message)
 
 
 bot.polling()
