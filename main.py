@@ -59,9 +59,9 @@ def start(message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(text='Узнать все про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
-    btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
     btn4 = types.KeyboardButton(text='Весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ')
-    kb.add(btn1, btn2, btn3, btn4)
+    btn5 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
+    kb.add(btn1, btn2, btn4, btn5)
     mess = f'Привет, <b>{message.from_user.first_name}!</b>'
     mess1 = f'Используй <b>меню кнопок</b> для дальнейшей работы'
     bot.send_message(message.chat.id, mess, parse_mode='html', reply_markup=kb)
@@ -120,6 +120,11 @@ def get_inf(message):
     mess1 = f'Чтобы узнать всё про олимпиаду, введите: \n<i>узнать все <b>название олимпиады</b></i>\nНапример: узнать все Высшая проба'
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
+@bot.message_handler(func=lambda x: x.text == 'Получить ссылку на сайт олимпиады')
+def get_lol(message):
+    mess1 = f'Чтобы получить ссылку олимпиады, введите: \n<i>ссылка <b>название олимпиады</b></i>\nНапример: ссылка Высшая проба'
+    bot.send_message(message.chat.id, mess1, parse_mode='html')
+
 
 @bot.message_handler(func=lambda msg: msg.text == "Вывести все олимпиады")
 def if_sp(message: types.Message):
@@ -161,6 +166,20 @@ def olympiadas(message):
             mess += 'Номер в списке РСОШ: ' + str(olymps.cell(row=line, column=1).value) + '\n'
             mess += 'Ссылка на сайт: ' + str(olymps.cell(row=line, column=5).value) + '\n'
             mess += 'Уровень: ' + str(olymps.cell(row=line, column=4).value) + '\n'
+            bot.send_message(message.chat.id, mess, reply_markup=kb)
+    elif len(text) > 7 and text[:7].lower() == 'ссылка ':
+        text = str(text[7:]).lower()
+        line = 0
+        for x in range(3, 22):
+            if text in str(olymps.cell(row=x, column=2).value).lower():
+                line = x
+                break
+        if line == 0:
+            wrong_request(message)
+        else:
+            btn1 = types.KeyboardButton(text='Вернуться в главное меню')
+            kb.add(btn1)
+            mess = str(olymps.cell(row=line, column=5).value)
             bot.send_message(message.chat.id, mess, reply_markup=kb)
     else:
         wrong_request(message)
