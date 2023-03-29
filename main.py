@@ -7,6 +7,9 @@ import pymorphy2
 import openpyxl
 
 bot = telebot.TeleBot(config.TOKEN)
+excel_file = openpyxl.load_workbook('calendar.xlsx')
+olymps = excel_file['Уровни']
+kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
 
 def print_day(n):
@@ -38,12 +41,12 @@ list_of_olymps = parser(config.URL1)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(text='Олимпиады РСОШ 22-23')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
-    kb.add(btn1, btn2)
+    btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
+    kb.add(btn1, btn2, btn3)
     mess = f'Привет, <b>{message.from_user.first_name}!</b>'
-    mess1 = f'Чтобы увидеть весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ введите любое число: '
+    mess1 = f'Используй <b>меню кнопок</b> для дальнейшей работы'
     bot.send_message(message.chat.id, mess, parse_mode='html', reply_markup=kb)
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
@@ -55,14 +58,8 @@ def website(message):
     bot.send_message(message.chat.id, "Перейдите на сайт", parse_mode='html', reply_markup=markup)
 
 
-@bot.message_handler(commands=['get_update'])
-def upd(message):
-    bot.send_message(message.chat.id, 'я тебе не скажу новостей, ты маленький ещё!!', parse_mode='html')
-
-
 @bot.message_handler(func=lambda x: x.text == 'Вернуться в главное меню')
 def return_(message: types.Message):
-    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(text='Олимпиады РСОШ 22-23')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     kb.add(btn1, btn2)
@@ -75,44 +72,49 @@ def if_sp(message: types.Message):
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
 
+@bot.message_handler(func=lambda msg: msg.text == "Узнать подробнее об этой олимпиаде")
+def if_sp(message: types.Message):
+    mess1 = 'Чтобы узнать уровень олимпиады, введите: \n<i>узнать уровень <b>название олимпиады</b></i>\nНапример: узнать уровень Высшая проба'
+    bot.send_message(message.chat.id, mess1, parse_mode='html')
+
+
+@bot.message_handler(func=lambda msg: msg.text == "Вывести все олимпиады")
+def if_sp(message: types.Message):
+    mess1 = str()
+    for x in range(3, 22):
+        mess1 += f'\U0001F538 {olymps.cell(row=x, column=2).value}\n'
+    bot.send_message(message.chat.id, mess1, parse_mode='html')
+
+
 @bot.message_handler(content_types=['text'])
 def olympiadas(message):
     text = message.text
-    kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
     ans = []
     if message.text.isdigit():
         for s in list_of_olymps:
             ans.append(s)
         if len(ans) == 0:
-            print('УВЫ! В это месяце нет олимпиад по информатике')
+            print('\uE333УВЫ! В это месяце нет олимпиад по информатике')
         else:
             bot.send_message(message.chat.id, '\n'.join(ans))
-    elif text[:15] == 'узнать уровень ':
-        text = str(text[:15]).lower()
-        text.replace('олимпиада', '')
-        text.replace('открытая', '')
-        excel_file = openpyxl.load_workbook('calendar.xlsx')
-        olymps = excel_file['Уровни']
+    elif len(text) > 15 and text[:15].lower() == 'узнать уровень ':
+        text = str(text[15:]).lower()
         line = 0
         for x in range(3, 22):
             if text in str(olymps.cell(row=x, column=2).value).lower():
                 line = x
+                break
         if line == 0:
-            kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            kb.row('Вернуться в главное меню')
-            error = 'Олимпиада находится не в списке РСОШ или вы ошиблись в названии'
+            kb.row('Вернуться в главное меню', 'Вывести все олимпиады')
+            error = '\uE333Олимпиада находится не в списке РСОШ или вы ошиблись в названии'
             btn = "Вернуться"
-            mess = f'Нажмите на кнопку {btn} и попробуйте ещё раз'
+            mess = f'Нажми на кнопку {btn} или ознакомься со списком всех олимпиад'
             bot.send_message(message.chat.id, error, reply_markup=kb)
             bot.send_message(message.chat.id, mess)
         else:
-            kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            kb.row('Вернуться в главное меню', 'Узнать подробнее об этой олимпиаде')
-            data = []
-            for x in range(1, 6):
-                data.append(olymps.cell(row=line, column=x).value)
-            bot.send_message(message.chat.id, f'УРОВЕНЬ: {data[3]}\n')
+            kb.row('Вернуться в главное меню', 'Получить ссылку на сайт олимпиады')
+            k = olymps.cell(row=line, column=4).value
+            bot.send_message(message.chat.id, f'УРОВЕНЬ: {k}\n', reply_markup=kb)
 
 
-
-bot.infinity_polling(skip_pending=True)
+bot.polling()
