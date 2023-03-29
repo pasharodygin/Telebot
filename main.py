@@ -9,6 +9,7 @@ import openpyxl
 bot = telebot.TeleBot(config.TOKEN)
 excel_file = openpyxl.load_workbook('calendar.xlsx')
 olymps = excel_file['Уровни']
+link = ''
 
 
 def print_olymp(message: types.Message):
@@ -56,7 +57,7 @@ list_of_olymps = parser(config.URL1)
 @bot.message_handler(commands=['start'])
 def start(message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton(text='Олимпиады РСОШ 22-23')
+    btn1 = types.KeyboardButton(text='Узнать всё про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
     kb.add(btn1, btn2, btn3)
@@ -76,7 +77,7 @@ def website(message):
 @bot.message_handler(func=lambda x: x.text == 'Вернуться в главное меню')
 def return_(message: types.Message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton(text='Олимпиады РСОШ 22-23')
+    btn1 = types.KeyboardButton(text='Узнать всё про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
     kb.add(btn1, btn2, btn3)
@@ -120,15 +121,11 @@ def olympiadas(message):
                 line = x
                 break
         if line == 0:
-            kb.row('Вернуться в главное меню', 'Вывести все олимпиады')
-            error = '\u274CОлимпиада находится не в списке РСОШ или вы ошиблись в названии'
-            btn = "Вернуться"
-            mess = f'Нажми на кнопку {btn} или ознакомься со списком всех олимпиад'
-            bot.send_message(message.chat.id, error, reply_markup=kb)
-            bot.send_message(message.chat.id, mess)
+            wrong_request(message)
         else:
-            kb.row('Вернуться в главное меню', 'Получить ссылку на сайт олимпиады')
+            kb.row('Вернуться в главное меню', 'Получить ссылку на сайт этой олимпиады')
             k = olymps.cell(row=line, column=4).value
+            link = olymps.cell(row=line, column=5).value
             bot.send_message(message.chat.id, f'УРОВЕНЬ: {k}\n', reply_markup=kb)
     else:
         wrong_request(message)
