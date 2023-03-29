@@ -9,7 +9,6 @@ import openpyxl
 bot = telebot.TeleBot(config.TOKEN)
 excel_file = openpyxl.load_workbook('calendar.xlsx')
 olymps = excel_file['Уровни']
-kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
 
 def print_olymp(message: types.Message):
@@ -42,7 +41,9 @@ def parser(url):
         ans.append(date + name + time)
     return ans
 
+
 def wrong_request(message: types.Message):
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     mess = 'Наш бот не может распознать ваше сообщение, убедитесь, что вы его правильно написали или вернитесь в главное меню'
     btn1 = types.KeyboardButton(text='Вернуться в главное меню')
     kb.add(btn1)
@@ -54,6 +55,7 @@ list_of_olymps = parser(config.URL1)
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(text='Олимпиады РСОШ 22-23')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
@@ -73,9 +75,11 @@ def website(message):
 
 @bot.message_handler(func=lambda x: x.text == 'Вернуться в главное меню')
 def return_(message: types.Message):
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(text='Олимпиады РСОШ 22-23')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
-    kb.add(btn1, btn2)
+    btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
+    kb.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id, "Теперь вы находитесь в главном меню, продолжайте работу", reply_markup=kb)
 
 
@@ -100,6 +104,7 @@ def if_sp(message: types.Message):
 def olympiadas(message):
     text = message.text
     ans = []
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     if message.text.isdigit():
         for s in list_of_olymps:
             ans.append(s)
