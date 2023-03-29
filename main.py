@@ -57,7 +57,7 @@ list_of_olymps = parser(config.URL1)
 @bot.message_handler(commands=['start'])
 def start(message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton(text='Узнать всё про олимпиаду')
+    btn1 = types.KeyboardButton(text='Узнать все про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
     kb.add(btn1, btn2, btn3)
@@ -77,7 +77,7 @@ def website(message):
 @bot.message_handler(func=lambda x: x.text == 'Вернуться в главное меню')
 def return_(message: types.Message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton(text='Узнать всё про олимпиаду')
+    btn1 = types.KeyboardButton(text='Узнать все про олимпиаду')
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
     kb.add(btn1, btn2, btn3)
@@ -90,9 +90,9 @@ def if_sp(message: types.Message):
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
 
-@bot.message_handler(func=lambda msg: msg.text == "Узнать подробнее об этой олимпиаде")
-def if_sp(message: types.Message):
-    mess1 = 'Чтобы узнать уровень олимпиады, введите: \n<i>узнать уровень <b>название олимпиады</b></i>\nНапример: узнать уровень Высшая проба'
+@bot.message_handler(func=lambda x: x.text == 'Узнать все про олимпиаду')
+def get_inf(message):
+    mess1 = 'Чтобы узнать всё про олимпиаду, введите: \n<i>узнать все <b>название олимпиады</b></i>\nНапример: узнать все Высшая проба'
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
 
@@ -127,6 +127,24 @@ def olympiadas(message):
             k = olymps.cell(row=line, column=4).value
             link = olymps.cell(row=line, column=5).value
             bot.send_message(message.chat.id, f'УРОВЕНЬ: {k}\n', reply_markup=kb)
+    elif len(text) > 11 and text[:11].lower() == 'узнать все ':
+        text = str(text[11:]).lower()
+        line = 0
+        for x in range(3, 22):
+            if text in str(olymps.cell(row=x, column=2).value).lower():
+                line = x
+                break
+        if line == 0:
+            wrong_request(message)
+        else:
+            btn1 = types.KeyboardButton(text='Вернуться в главное меню')
+            kb.add(btn1)
+            mess = str()
+            mess += f'<b>{str(olymps.cell(row=line, column=2).value)}</b>:\n'
+            mess += 'Номер в списке РСОШ: ' + str(olymps.cell(row=line, column=1).value) + '\n'
+            mess += 'Ссылка на сайт: ' + str(olymps.cell(row=line, column=5).value) + '\n'
+            mess += 'Уровень: ' + str(olymps.cell(row=line, column=4).value) + '\n'
+            bot.send_message(message.chat.id, mess, reply_markup=kb)
     else:
         wrong_request(message)
 
