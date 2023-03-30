@@ -110,7 +110,7 @@ def return_(message: types.Message):
 
 
 @bot.message_handler(func=lambda msg: msg.text == "Узнать уровень ОЛИМПИАДЫ")
-def if_sp(message: types.Message):
+def get_lvl(message: types.Message):
     mess1 = 'Чтобы узнать уровень олимпиады, введите: \n<i>узнать уровень <b>название олимпиады</b></i>\nНапример: узнать уровень Высшая проба'
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
@@ -119,6 +119,7 @@ def if_sp(message: types.Message):
 def get_inf(message):
     mess1 = f'Чтобы узнать всё про олимпиаду, введите: \n<i>узнать все <b>название олимпиады</b></i>\nНапример: узнать все Высшая проба'
     bot.send_message(message.chat.id, mess1, parse_mode='html')
+
 
 @bot.message_handler(func=lambda x: x.text == 'Получить ссылку на сайт олимпиады')
 def get_lol(message):
