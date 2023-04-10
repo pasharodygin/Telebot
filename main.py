@@ -61,9 +61,11 @@ def start(message):
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn4 = types.KeyboardButton(text='Весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ')
     btn5 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
-    kb.add(btn1, btn2, btn4, btn5)
+    btn6 = types.KeyboardButton(text="Вывести все олимпиады")
+    kb.add(btn1, btn2, btn4, btn5, btn6)
+    s = 'меню кнопок'
     mess = f'Привет, <b>{message.from_user.first_name}!</b>'
-    mess1 = f'Используй <b>меню кнопок</b> для дальнейшей работы'
+    mess1 = f'Используй <b>{s}</b> для дальнейшей работы'
     bot.send_message(message.chat.id, mess, parse_mode='html', reply_markup=kb)
     bot.send_message(message.chat.id, mess1, parse_mode='html')
 
@@ -105,7 +107,8 @@ def return_(message: types.Message):
     btn2 = types.KeyboardButton(text='Узнать уровень ОЛИМПИАДЫ')
     btn3 = types.KeyboardButton(text='Получить ссылку на сайт олимпиады')
     btn4 = types.KeyboardButton(text='Весь список олимпиад на ТЕКУЩИЙ МЕСЯЦ')
-    kb.add(btn1, btn2, btn3, btn4)
+    btn6 = types.KeyboardButton(text="Вывести все олимпиады")
+    kb.add(btn1, btn2, btn3, btn4, btn6)
     bot.send_message(message.chat.id, "Теперь вы находитесь в главном меню, продолжайте работу", reply_markup=kb)
 
 
